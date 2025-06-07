@@ -98,7 +98,7 @@
             <input class="mdl-textfield__input" type="url" id="url-input">
             <label class="mdl-textfield__label" for="url-input">URL eingeben</label>
         </div>
-        <input type="text" id="expire-input" class="flatpickr-input" placeholder="Ablaufdatum und Uhrzeit wählen">
+        <input type="text" id="expire-input" class="flatpickr-input" placeholder="Ablaufdatum und Uhrzeit (YYYY-MM-DD,HH:MM)">
         <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" onclick="createLink()">
             Link erstellen
         </button>
@@ -112,7 +112,7 @@
         </div>
     </div>
     <script>
-        const apiUrl = 'https://cracky.ddns.net/services/linkApi.php'; // API-URL anpassen
+        const apiUrl = 'https://cracky.ddns.net/services/linkApi.php'; // API-URL angepasst
 
         // Flatpickr initialisieren
         flatpickr('#expire-input', {
@@ -120,9 +120,15 @@
             dateFormat: 'Y-m-d,H:i',
             time_24hr: true,
             minDate: 'today',
-            defaultHour: 23,
-            defaultMinute: 59
+            defaultHour: 11,
+            defaultMinute: 30,
+            defaultDate: new Date() // Heutiges Datum als Standard
         });
+
+        function validateDateFormat(date) {
+            const regex = /^\d{4}-\d{2}-\d{2},\d{2}:\d{2}$/;
+            return regex.test(date);
+        }
 
         async function createLink() {
             const url = document.getElementById('url-input').value;
@@ -133,6 +139,13 @@
             if (!url || !expire) {
                 resultDiv.style.display = 'block';
                 resultDiv.innerHTML = '<p style="color: red;">Bitte URL und Ablaufdatum angeben.</p>';
+                qrContainer.style.display = 'none';
+                return;
+            }
+
+            if (!validateDateFormat(expire)) {
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = '<p style="color: red;">Ablaufdatum muss im Format YYYY-MM-DD,HH:MM sein (z.B. 2025-06-07,11:30).</p>';
                 qrContainer.style.display = 'none';
                 return;
             }
