@@ -7,33 +7,39 @@ if (!file_exists($jsonFile)) {
     file_put_contents($jsonFile, json_encode([]));
 }
 
-function loadLinks() {
+function loadLinks()
+{
     global $jsonFile;
     return json_decode(file_get_contents($jsonFile), true) ?: [];
 }
 
-function saveLinks($links) {
+function saveLinks($links)
+{
     global $jsonFile;
     file_put_contents($jsonFile, json_encode($links, JSON_PRETTY_PRINT));
 }
 
-function generateLinkID() {
+function generateLinkID()
+{
     return substr(md5(uniqid(rand(), true)), 0, 8);
 }
 
-function validateDate($date) {
+function validateDate($date)
+{
     return DateTime::createFromFormat('Y-m-d,H:i', $date) !== false;
 }
 
-function isExpired($expire) {
+function isExpired($expire)
+{
     $expireDate = new DateTime($expire);
     $now = new DateTime();
     return $now > $expireDate;
 }
 
-function cleanExpiredLinks() {
+function cleanExpiredLinks()
+{
     $links = loadLinks();
-    $updatedLinks = array_filter($links, function($link) {
+    $updatedLinks = array_filter($links, function ($link) {
         return !isExpired($link['expire']);
     });
     if (count($links) !== count($updatedLinks)) {
